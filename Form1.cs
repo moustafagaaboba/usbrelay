@@ -4,6 +4,9 @@ namespace usbrelay
 {
     public partial class Form1 : Form
     {
+        HidDevice device;
+        HidStream stream;
+
         public Form1()
         {
             InitializeComponent();
@@ -15,6 +18,10 @@ namespace usbrelay
 
         private void RefreshDevices()
         {
+            if (stream != null)
+            {
+                stream.Close();
+            }
             var devices_list = DeviceList.Local;
             var hid_devices = devices_list.GetHidDevices().ToArray();
 
@@ -60,7 +67,11 @@ namespace usbrelay
 
         private void ResetLights()
         {
-            foreach(var control in Controls)
+            if (stream != null)
+            {
+                stream.Close();
+            }
+            foreach (var control in Controls)
             {
                 if (control.ToString().Contains("Light"))
                 {
@@ -95,8 +106,6 @@ namespace usbrelay
                 Button button = sender as Button;
                 int light_number = Convert.ToInt32(button.Text.Remove(0, 6));
 
-                HidDevice device;
-                HidStream stream;
                 byte[] open = new byte[] { 0x00, (byte)(0xf0 | light_number) };
                 byte[] close = new byte[] { 0x00, (byte)(0x00 | light_number) };
                 var list = DeviceList.Local;
@@ -112,7 +121,6 @@ namespace usbrelay
                     {
                         stream.Write(open);
                     }
-                    stream.Close();
                 }
                 else
                 {
