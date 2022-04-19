@@ -36,7 +36,14 @@ namespace usbrelay
             {
                 if (dev.ProductID == 0x05DF && dev.VendorID == 0x16C0)
                 {
-                    listBoxDevices.Items.Add(dev.GetSerialNumber());
+                    try
+                    {
+                        listBoxDevices.Items.Add(dev.GetSerialNumber());
+                    }
+                    catch
+                    {
+                        listBoxDevices.Items.Add("Board name error");
+                    }
                 }
             }
 
@@ -46,7 +53,6 @@ namespace usbrelay
             }
 
 
-            //TODO: Count>0
             if (listBoxDevices.SelectedItems.Count > 0)
             {
                 HidDevice device;
@@ -57,6 +63,7 @@ namespace usbrelay
                 {
                     stream = device.Open();
                     var temp = stream.Read();
+                    MessageBox.Show("" + temp);
                 }
                 else
                 {
@@ -77,30 +84,12 @@ namespace usbrelay
                 {
                     Button button = control as Button;
                     button.BackColor = SystemColors.Control;
-                    /*
-                    if ((button.Text.Contains("" + light) && (light > -1)) || (light == -1))
-                    {
-                        if (state == LIGHTS_NONE)
-                        {
-                            button.BackColor  = SystemColors.Control;
-                        }
-                        else if(state == LIGHTS_ON)
-                        {
-                            button.BackColor = Color.LightGreen;
-                        }
-                        else if(state == LIGHTS_OFF)
-                        {
-                            button.BackColor = Color.OrangeRed;
-                        }
-                    }
-                    */
                 }
             }
         }
 
         private void Button_Click(object sender, EventArgs e)
         {
-            //TODO: Count>0
             if (listBoxDevices.SelectedItems.Count > 0)
             {
                 Button button = sender as Button;
@@ -127,7 +116,17 @@ namespace usbrelay
                     MessageBox.Show("Please make sure that usb is connected correctly!");
                 }
 
-                RefreshDevices();
+                // TODO: get current states from board inside RefreshDevices()
+                //RefreshDevices();
+
+                if (button.BackColor == Color.LightGreen)
+                {
+                    button.BackColor = Color.OrangeRed;
+                }
+                else
+                {
+                    button.BackColor = Color.LightGreen;
+                }
             }
         }
 
@@ -138,7 +137,7 @@ namespace usbrelay
 
         private void ListBoxDevices_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if(listBoxDevices.SelectedItems.Count == 0)
+            if (listBoxDevices.SelectedItems.Count == 0)
             {
                 ResetLights();
             }
